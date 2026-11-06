@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rental Market Valuation Predictor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .section-header {
+            font-size: 0.95rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #495057;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 4px;
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+<div class="container py-5" style="max-width: 1150px;">
+    <h2 class="text-center mb-4 font-monospace">Rental Market Valuation Predictor</h2>
+
+    <!-- ARCHITECTURE MODE TOGGLE CONTROL -->
+    <div class="card shadow-sm p-3 mb-4 bg-white border-0">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <strong class="text-secondary">Architecture Setup:</strong>
+                <span class="badge {% if use_multi_model %}bg-success{% else %}bg-primary{% endif %} ms-2 fs-6">
+                    {% if use_multi_model %}Model by Unit Type{% else %}Unified Model{% endif %}
+                </span>
+            </div>
+            <div class="form-check form-switch fs-5 mb-0">
+                <input class="form-check-input" type="checkbox" role="switch" id="multiModelToggle" 
+                       {% if use_multi_model %}checked{% endif %} onchange="toggleMode(this)">
+                <label class="form-check-label fs-6 fw-bold" for="multiModelToggle">
+                    Enable Model by Unit Type
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- LEFT COLUMN: INPUT FORM -->
+        <div class="col-lg-7">
+            <div class="card shadow-sm p-4">
+                {% if error %}
+                    <div class="alert alert-danger mb-4">{{ error }}</div>
+                {% endif %}
+
+                <form action="/predict" method="POST" id="evalForm">
+
+                    <!-- Hidden flag for model mode -->
+                    <input type="hidden" name="use_multi_model" id="use_multi_model_input" value="{{ 1 if use_multi_model else 0 }}">
+
+                    <!-- UNIT TYPE & MODEL SELECTION -->
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <label for="unittype" class="form-label fw-bold">Unit Type</label>
+                            <select class="form-select border-primary" id="unittype" name="unittype" required>
+                                {% for unit_name in unit_options %}
+                                    <option value="{{ unit_name }}" 
+                                        {% if form_data and form_data.get('unittype') == unit_name %}selected
+                                        {% elif selected_unit == unit_name %}selected{% endif %}>
+                                        {{ unit_name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="model_choice" class="form-label fw-bold">Machine Learning Model</label>
+                            <select class="form-select border-primary" id="model_choice" name="model_choice" required>
+                                {% for model_name in model_options %}
+                                    <option value="{{ model_name }}" 
+                                        {% if form_data and form_data.get('model_choice') == model_name %}selected{% endif %}>
+                                        {{ model_name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- PROPERTY SPECIFICATIONS -->
+                    <div class="section-header text-primary">Property Specifications</div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="price" class="form-label">Listed Price ($/month)</label>
+                            <input type="number" step="any" class="form-control" id="price" name="price" 
+                                   value="{{ form_data.get('price', 2400) if form_data else 2400 }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="areainfeet" class="form-label">Square Feet (areainfeet)</label>
+                            <input type="number" step="any" class="form-control" id="areainfeet" name="areainfeet" 
+                                   value="{{ form_data.get('areainfeet', 800) if form_data else 800 }}" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="bedrooms_num" class="form-label">Bedrooms</label>
+                            <input type="number" step="0.5" class="form-control" id="bedrooms_num" name="bedrooms_num" 
+                                   value="{{ form_data.get('bedrooms_num', 2) if form_data else 2 }}" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="bathrooms_num" class="form-label">Bathrooms</label>
+                            <input type="number" step="0.5" class="form-control" id="bathrooms_num" name="bathrooms_num" 
+                                   value="{{ form_data.get('bathrooms_num', 1) if form_data else 1 }}" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="parking_spots_num" class="form-label">Parking Spots</label>
+                            <input type="number" step="1" class="form-control" id="parking_spots_num" name="parking_spots_num" 
+                                   value="{{ form_data.get('parking_spots_num', 0) if form_data else 0 }}" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="lat" class="form-label">Latitude</label>
+                            <input type="number" step="any" class="form-control" id="lat" name="lat" 
+                                   value="{{ form_data.get('lat', 43.6532) if form_data else 43.6532 }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="lon" class="form-label">Longitude</label>
+                            <input type="number" step="any" class="form-control" id="lon" name="lon" 
+                                   value="{{ form_data.get('lon', -79.3832) if form_data else -79.3832 }}" required>
+                        </div>
+                    </div>
+
+                    <!-- POLICY & LEASE TERMS -->
+                    <div class="section-header">Policy & Lease Terms</div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="smoking_policy" class="form-label">Smoking Permitted</label>
+                            <select class="form-select" id="smoking_policy" name="smoking_policy">
+                                <option value="no" {% if not form_data or form_data.get('smoking_policy') == 'no' %}selected{% endif %}>No</option>
+                                <option value="outdoors" {% if form_data and form_data.get('smoking_policy') == 'outdoors' %}selected{% endif %}>Outdoors only</option>
+                                <option value="yes" {% if form_data and form_data.get('smoking_policy') == 'yes' %}selected{% endif %}>Yes</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="pets_allowed_policy" class="form-label">Pets Allowed</label>
+                            <select class="form-select" id="pets_allowed_policy" name="pets_allowed_policy">
+                                <option value="no" {% if not form_data or form_data.get('pets_allowed_policy') == 'no' %}selected{% endif %}>No</option>
+                                <option value="limited" {% if form_data and form_data.get('pets_allowed_policy') == 'limited' %}selected{% endif %}>Limited</option>
+                                <option value="yes" {% if form_data and form_data.get('pets_allowed_policy') == 'yes' %}selected{% endif %}>Yes</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="agreement_1yr_bin" class="form-label">1-Year Lease</label>
+                            <select class="form-select" id="agreement_1yr_bin" name="agreement_1yr_bin">
+                                <option value="0" {% if not form_data or form_data.get('agreement_1yr_bin') == '0' %}selected{% endif %}>No</option>
+                                <option value="1" {% if form_data and form_data.get('agreement_1yr_bin') == '1' %}selected{% endif %}>Yes</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- INCLUDED UTILITIES -->
+                    <div class="section-header">Included Utilities</div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="hydro_bin" class="form-label">Hydro / Electricity</label>
+                            <select class="form-select" id="hydro_bin" name="hydro_bin">
+                                <option value="0" {% if not form_data or form_data.get('hydro_bin') == '0' %}selected{% endif %}>No</option>
+                                <option value="1" {% if form_data and form_data.get('hydro_bin') == '1' %}selected{% endif %}>Yes</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="heat_bin" class="form-label">Heat Included</label>
+                            <select class="form-select" id="heat_bin" name="heat_bin">
+                                <option value="0" {% if not form_data or form_data.get('heat_bin') == '0' %}selected{% endif %}>No</option>
+                                <option value="1" {% if form_data and form_data.get('heat_bin') == '1' %}selected{% endif %}>Yes</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="water_bin" class="form-label">Water Included</label>
+                            <select class="form-select" id="water_bin" name="water_bin">
+                                <option value="0" {% if not form_data or form_data.get('water_bin') == '0' %}selected{% endif %}>No</option>
+                                <option value="1" {% if form_data and form_data.get('water_bin') == '1' %}selected{% endif %}>Yes</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- INTERIOR & COMFORT -->
+                    <div class="section-header">Interior & Comfort</div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="airconditioning_bin" class="form-label">Air Conditioning</label>
+                            <select class="form-select" id="airconditioning_bin" name="airconditioning_bin">
+                                <option value="0" {% if not form_data or form_data.get('airconditioning_bin') == '0' %}selected{% endif %}>No</option>
+                                <option value="1" {% if form_data and form_data.get('airconditioning_bin') == '1' %}selected{% endif %}>Yes</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="laundryinunit_bin" class="form-label">Laundry In-Unit</label>
+                            <select class="form-select" id="laundryinunit_bin" name="laundryinunit_bin">
+                                <option value="0" {% if not form_data or form_data.get('laundryinunit_bin') == '0' %}selected{% endif %}>No</option>
+                                <option value="1" {% if form_data and form_data.get('laundryinunit_bin') == '1' %}selected{% endif %}>Yes</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="dishwasher_bin" class="form-label">Dishwasher</label>
+                            <select class="form-select" id="dishwasher_bin" name="dishwasher_bin">
+                                <option value="0" {% if not form_data or form_data.get('dishwasher_bin') == '0' %}selected{% endif %}>No</option>
+                                <option value="1" {% if form_data and form_data.get('dishwasher_bin') == '1' %}selected{% endif %}>Yes</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="furnished_bin" class="form-label">Furnished</label>
+                            <select class="form-select" id="furnished_bin" name="furnished_bin">
+                                <option value="0" {% if not form_data or form_data.get('furnished_bin') == '0' %}selected{% endif %}>No</option>
+                                <option value="1" {% if form_data and form_data.get('furnished_bin') == '1' %}selected{% endif %}>Yes</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- OUTDOOR & BUILDING AMENITIES -->
+                    <div class="section-header">Outdoor & Building Amenities</div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="gym_bin" class="form-label">Gym / Fitness Center</label>
+                            <select class="form-select" id="gym_bin" name="gym_bin">
+                                <option value="0" {% if not form_data or form_data.get('gym_bin') == '0' %}selected{% endif %}>No</option>
+                                <option value="1" {% if form_data and form_data.get('gym_bin') == '1' %}selected{% endif %}>Yes</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="balcony_bin" class="form-label">Balcony</label>
+                            <select class="form-select" id="balcony_bin" name="balcony_bin">
+                                <option value="0" {% if not form_data or form_data.get('balcony_bin') == '0' %}selected{% endif %}>No</option>
+                                <option value="1" {% if form_data and form_data.get('balcony_bin') == '1' %}selected{% endif %}>Yes</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="yard_bin" class="form-label">Yard / Garden</label>
+                            <select class="form-select" id="yard_bin" name="yard_bin">
+                                <option value="0" {% if not form_data or form_data.get('yard_bin') == '0' %}selected{% endif %}>No</option>
+                                <option value="1" {% if form_data and form_data.get('yard_bin') == '1' %}selected{% endif %}>Yes</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg w-100 mt-3">Evaluate Valuation</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: VALUATION RESULT CONTAINER -->
+        <div class="col-lg-5">
+            <div class="sticky-top" style="top: 20px;">
+                {% if result %}
+                <div class="card shadow-sm p-4 border-{{ result.color_class }}">
+                    <h4 class="text-{{ result.color_class }} mb-2">{{ result.status }}</h4>
+                    <p class="text-muted small mb-3">Evaluated via <strong>{{ result.mode_label }}</strong></p>
+
+                    <p class="mb-1"><strong>Unit Type:</strong> <span class="text-secondary">{{ result.selected_unit }}</span></p>
+                    <p class="mb-2"><strong>Selected Model:</strong><br><span class="text-secondary">{{ result.selected_model }}</span></p>
+                    <hr>
+                    <p class="mb-1"><strong>Listed Price:</strong> ${{ "%.2f"|format(result.listed_price) }}</p>
+                    <p class="mb-2"><strong>Predicted Fair Value:</strong> ${{ "%.2f"|format(result.predicted_fair_value) }}</p>
+                    <div class="alert alert-{{ result.color_class }} mt-3 mb-0 p-2 small">
+                        {{ result.summary }}
+                    </div>
+                </div>
+                {% else %}
+                <div class="card shadow-sm p-4 text-center text-muted">
+                    <h5>Valuation Output</h5>
+                    <p class="mb-0">Select your unit type and property specs on the left, then click <strong>Evaluate Valuation</strong> to view predicted market status.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleMode(toggleElement) {
+    const isMulti = toggleElement.checked ? '1' : '0';
+    document.getElementById('use_multi_model_input').value = isMulti;
+    window.location.href = '/?use_multi_model=' + isMulti;
+}
+</script>
+
+</body>
+</html>

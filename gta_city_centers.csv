@@ -1,0 +1,26 @@
+city,region,lat,lon,region pop,
+Toronto,Toronto,43.6532,-79.3832,3271830,10km
+Mississauga,Peel,43.589,-79.6441,1632557,18km
+Brampton,Peel,43.7315,-79.7624,1632557,21km
+Caledon,Peel,43.8797,-79.7347,1632557,
+Vaughan,York,43.8372,-79.5083,1299177,19km
+Markham,York,43.8561,-79.337,1299177,18km
+Richmond Hill,York,43.8828,-79.4403,1299177,
+Newmarket,York,44.0592,-79.4613,1299177,
+Aurora,York,44.0065,-79.4504,1299177,
+Stouffville,York,43.9708,-79.2483,1299177,
+King City,York,43.9248,-79.5273,1299177,
+East Gwillimbury,York,44.1031,-79.4441,1299177,
+Georgina,York,44.2325,-79.4636,1299177,
+Oakville,Halton,43.4675,-79.6877,666454,
+Burlington,Halton,43.3255,-79.799,666454,
+Milton,Halton,43.5183,-79.8774,666454,
+Halton Hills,Halton,43.6496,-79.9197,666454,
+Oshawa,Durham,43.8971,-78.8658,810075,
+Pickering,Durham,43.8384,-79.0868,810075,
+Ajax,Durham,43.8509,-79.0204,810075,
+Whitby,Durham,43.8975,-78.9429,810075,
+Clarington,Durham,43.9113,-78.6874,810075,
+Uxbridge,Durham,44.1097,-79.1215,810075,
+Scugog,Durham,44.1039,-78.9443,810075,
+Brock,Durham,44.4328,-79.1554,810075,

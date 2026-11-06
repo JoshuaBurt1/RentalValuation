@@ -1,0 +1,45 @@
+[LEVEL 1: Original Filtered Dataset]
+Count:                                 5,690
+Average (Mean) Price:                  $2,060.98
+Median Price:                          $1,949.00
+Minimum Price:                         $375.00
+Maximum Price:                         $18,550.00
+Max Price URL:                         https://www.kijiji.ca/v-apartments-condos/mississauga-peel-region/apartment-for-rent/1744828336
+Range:                                 $18,175.00
+Variance:                              $764,250.51
+Standard Deviation:                    $874.21
+Q1 (25th Percentile):                  $1,600.00
+Q3 (75th Percentile):                  $2,475.00
+IQR (Interquartile Range):             $875.00
+1.5x IQR Fence [Lower, Upper]:         [$287.50, $3,787.50]
+  - Low Outliers (< Lower):            0
+  - High Outliers (> Upper):           140
+3.0x IQR Fence [Lower, Upper]:         [$-1,025.00, $5,100.00]
+  - Low Extreme Outliers (< Lower):    0
+  - High Extreme Outliers (> Upper):   24
+Mean Absolute Deviation (MAD):         $589.02
+Median Absolute Deviation (MedAD):       $449.00
+
+[LEVEL 2: Extreme Outliers Removed (3.0x IQR)]
+Entries Remaining:                     5,666
+Average (Mean) Price:                  $2,032.87
+Median Price:                          $1,935.00
+Minimum Price:                         $375.00
+Maximum Price:                         $5,000.00
+Range:                                 $4,625.00
+Variance:                              $516,836.07
+Standard Deviation:                    $718.91
+Mean Absolute Deviation (MAD):         $559.52
+Median Absolute Deviation (MedAD):       $435.00
+
+[LEVEL 3: All Outliers Removed (1.5x IQR)]
+Entries Remaining:                     5,550
+Average (Mean) Price:                  $1,988.54
+Median Price:                          $1,900.00
+Minimum Price:                         $375.00
+Maximum Price:                         $3,786.00
+Range:                                 $3,411.00
+Variance:                              $429,209.85
+Standard Deviation:                    $655.14
+Mean Absolute Deviation (MAD):         $520.96
+Median Absolute Deviation (MedAD):       $400.00

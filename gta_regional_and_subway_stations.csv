@@ -1,0 +1,213 @@
+station_name,latitude,longitude,transit_type,operator
+Acton,43.6340679,-80.0351117,station,Alstom
+Aga Khan Park & Museum,43.7223874,-79.3327547,light_rail,
+Agincourt,43.7860522,-79.284356,station,Alstom
+Ajax,43.847988,-79.0427908,station,GO Transit
+Albion,43.7411377,-79.5892051,light_rail,Toronto Transit Commission
+Aldershot,43.3132976,-79.8555856,station,GO Transit
+Allandale Waterfront,44.3733669,-79.6867991,station,Alstom
+Amherst Street,42.9399438,-78.8383516,light_rail,Niagara Frontier Transportation Authority
+Appleby,43.3791487,-79.761351,station,GO Transit
+Audubon Town Center,43.0155544,-78.7817337,light_rail,Niagra Frontier Transportation Authority
+Aurora,44.0007626,-79.4597654,station,GO Transit
+Avenue,43.7045982,-79.4087872,light_rail,
+Barrie South,44.351138,-79.6274392,station,GO Transit
+Bathurst,43.6659322,-79.4112359,subway,Toronto Transit Commission
+Bay,43.6701851,-79.3902694,subway,Toronto Transit Commission
+Bayview,43.7667987,-79.3873787,subway,Toronto Transit Commission
+Bessarion,43.7691308,-79.3765761,subway,Toronto Transit Commission
+Birchmount,43.7302008,-79.2769534,light_rail,
+Block Line,43.4227326,-80.4629847,light_rail,Grand River Transit
+Bloomington,43.9762474,-79.397251,station,GO Transit
+Bloor,43.6577734,-79.4507397,station,GO Transit
+Bloor-Yonge,43.6707855,-79.3856867,subway,Toronto Transit Commission
+Borden,43.4423447,-80.4750673,light_rail,Grand River Transit
+Boulevard Mall (Park & Ride),42.9877015,-78.822694,light_rail,Niagra Frontier Transportation Authority
+Bradford,44.1171265,-79.5560133,station,GO Transit
+Bramalea,43.70139,-79.6919794,station,GO Transit
+Brampton Innovation District,43.6868917,-79.7646832,station,GO Transit
+Brantford,43.1465125,-80.2654516,station,VIA Rail
+Broadview,43.6769946,-79.3582181,subway,Toronto Transit Commission
+Bronte,43.4171598,-79.722347,station,GO Transit
+Burlington,43.3408481,-79.8097034,station,GO Transit
+Caledonia,43.6923229,-79.4653403,light_rail,
+Castle Frank,43.6734986,-79.3690458,subway,Toronto Transit Commission
+Cedarvale,43.6992438,-79.4361076,subway,Toronto Transit Commission
+Centennial,43.8738256,-79.288858,station,Alstom
+Central Station,43.4531378,-80.4989591,light_rail,Grand River Transit
+Chaplin,43.7027932,-79.417291,light_rail,Toronto Transit Commission
+Chester,43.6782277,-79.3525143,subway,Toronto Transit Commission
+Christie,43.6641066,-79.4183969,subway,Toronto Transit Commission
+Clarkson,43.5122196,-79.6342424,station,GO Transit
+College,43.6606617,-79.3827952,subway,Toronto Transit Commission
+Confederation,43.2418146,-79.7597799,station,Alstom
+Cooksville,43.5830451,-79.6240431,station,GO Transit
+Coxwell,43.6841524,-79.323043,subway,Toronto Transit Commission
+Danforth,43.6864333,-79.3003555,station,Alstom
+Davisville,43.697936,-79.3972908,subway,Toronto Transit Commission
+Decatur,42.9692323,-78.8234155,light_rail,Niagra Frontier Transportation Authority
+Delavan/Canisius College,42.9225352,-78.8568809,light_rail,Niagara Frontier Transportation Authority
+Dixie,43.6080162,-79.5777401,station,GO Transit
+Don Mills,43.775347,-79.3459439,subway,Toronto Transit Commission
+Don Valley,43.7204924,-79.3388801,light_rail,
+Donlands,43.6810265,-79.3377871,subway,Toronto Transit Commission
+Downsview Park,43.7535983,-79.4784098,subway,Toronto Transit Commission
+Driftwood,43.7580635,-79.5133814,light_rail,Toronto Transit Commission
+Dufferin,43.6602635,-79.4353869,subway,Toronto Transit Commission
+Duncanwoods,43.7489724,-79.556895,light_rail,Toronto Transit Commission
+Dundas West,43.656937,-79.4530402,subway,Toronto Transit Commission
+Dupont,43.6747046,-79.406983,subway,Toronto Transit Commission
+Durham College Oshawa,43.8708144,-78.8863834,station,GO Transit / VIA Rail
+East Gwillimbury,44.078008,-79.4558241,station,GO Transit
+Eggert,42.9801299,-78.8229971,light_rail,Niagra Frontier Transportation Authority
+Eglinton,43.7394646,-79.2320997,station,Alstom
+Ellesmere,43.7668074,-79.2762856,light_rail,Toronto Transit Commission
+Ellicott Complex,43.0057084,-78.7844011,light_rail,Niagra Frontier Transportation Authority
+Emery,43.7520405,-79.5423827,light_rail,Toronto Transit Commission
+Erindale,43.5676783,-79.6670765,station,GO Transit
+Etobicoke North,43.7064243,-79.5631531,station,GO Transit
+Exhibition,43.6360095,-79.4188537,station,GO Transit
+Fairbank,43.6957428,-79.4500647,light_rail,Eglinton Crosstown LRT
+Fairway,43.4223142,-80.4418635,light_rail,Grand River Transit
+Finch,43.7812974,-79.4158993,subway,Toronto Transit Commission
+Finch West,43.7639743,-79.4915419,subway,Toronto Transit Commission
+Flint,42.9992604,-78.7892535,light_rail,Niagra Frontier Transportation Authority
+Forest Hill,43.7010475,-79.4255354,light_rail,Toronto Transit Commission
+Frederick,43.4495596,-80.4874169,light_rail,Grand River Transit
+Georgetown,43.6553828,-79.9190449,station,VIA Rail;GO Transit
+Glencairn,43.7086497,-79.4406853,subway,Toronto Transit Commission
+Golden Mile,43.7278547,-79.2876481,light_rail,
+Gormley,43.9412657,-79.3989309,station,GO Transit
+Greenwood,43.6825599,-79.3302652,subway,Toronto Transit Commission
+Grimsby,43.1959356,-79.5580499,station,VIA Rail
+Guelph Central Station,43.5443631,-80.2469286,station,GO Transit
+Guildwood,43.7552251,-79.1982293,station,GO Transit
+Hakimi Lebovic,43.726982,-79.2915569,light_rail,
+Hamilton GO Centre,43.2531092,-79.8691839,station,Alstom
+High Park,43.6538668,-79.4668644,subway,Toronto Transit Commission
+Highway 407,43.7833141,-79.5230877,subway,Toronto Transit Commission
+Humber College,43.7299048,-79.6015296,light_rail,Toronto Transit Commission
+Humboldt Hospital,42.9275497,-78.8515839,light_rail,Niagara Frontier Transportation Authority
+I-990 (Park & Ride),43.0269078,-78.7828199,light_rail,Niagra Frontier Transportation Authority
+Ionview,43.7312791,-79.2722271,light_rail,
+Islington,43.645335,-79.5248163,subway,Toronto Transit Commission
+Jane,43.6499177,-79.4838463,subway,Toronto Transit Commission
+Jane and Finch,43.7572507,-79.517746,light_rail,Toronto Transit Commission
+Keele,43.655569,-79.4595795,subway,Toronto Transit Commission
+Keelesdale,43.6904666,-79.4747508,light_rail,Toronto Transit Commission
+Kennedy,43.732429,-79.2637529,subway,Toronto Transit Commission
+King,43.6489494,-79.3777538,subway,Toronto Transit Commission
+King City,43.9201118,-79.5270426,station,GO Transit
+Kipling,43.6376161,-79.5355081,subway,Toronto Transit Commission
+Kitchener,43.455625,-80.4931286,station,GO Transit
+Kitchener City Hall,43.4520255,-80.4910757,light_rail,Grand River Transit
+Kitchener Market,43.4463581,-80.4837384,light_rail,Grand River Transit
+LaSalle,42.9477411,-78.8297514,light_rail,Niagara Frontier Transportation Authority
+Laird,43.7135918,-79.3648794,light_rail,Toronto Transit Commission
+Langstaff,43.8386759,-79.4226626,station,GO Transit
+Lansdowne,43.6591114,-79.4427866,subway,Toronto Transit Commission
+Lawrence,43.7263483,-79.4024743,subway,Toronto Transit Commission
+Lawrence East,43.7504987,-79.2701863,light_rail,Toronto Transit Commission
+Lawrence West,43.7152207,-79.4439143,subway,Toronto Transit Commission
+Leaside,43.7111037,-79.3771168,light_rail,Toronto Transit Commission
+Lee,43.0027922,-78.7858135,light_rail,Niagra Frontier Transportation Authority
+Leslie,43.7710725,-79.365634,subway,Toronto Transit Commission
+Lisgar,43.5905809,-79.788362,station,GO Transit
+Long Branch,43.5915,-79.5463,station,GO Transit / TTC
+Main Street,43.6890489,-79.3016043,subway,Toronto Transit Commission
+Malton,43.7051705,-79.6382343,station,Alstom
+Maple,43.8594952,-79.5068973,station,GO Transit
+Markham,43.8826569,-79.2624676,station,GO Transit
+Martin Grove,43.7366316,-79.5923394,light_rail,Toronto Transit Commission
+McCowan,43.7749091,-79.2515777,light_rail,Toronto Transit Commission
+Meadowvale,43.5975336,-79.7543022,station,GO Transit
+Midland,43.7704537,-79.271982,light_rail,Toronto Transit Commission
+Mill,43.4337406,-80.4780507,light_rail,Grand River Transit
+Milliken,43.8231743,-79.3017626,station,Alstom
+Milton,43.5235625,-79.8669326,station,GO Transit
+Milvan Rumike,43.7499601,-79.552337,light_rail,Toronto Transit Commission
+Mimico,43.6166773,-79.4968048,station,Alstom
+Mount Dennis,43.6877711,-79.4878946,station,GO Transit
+Mount Joy,43.900508,-79.2630684,station,GO Transit
+Mount Olive,43.7433737,-79.5813581,light_rail,Toronto Transit Commission
+Mount Pleasant,43.6750771,-79.8225943,station,GO Transit
+Museum,43.6668462,-79.3933506,subway,Toronto Transit Commission
+Newmarket,44.0605058,-79.4600755,station,GO Transit
+Niagara Falls,43.1089907,-79.0633031,station,GO Transit / VIA Rail
+Norfinch Oakdale,43.7559301,-79.524251,light_rail,Toronto Transit Commission
+North York Centre,43.7686787,-79.4126298,subway,Toronto Transit Commission
+O'Connor,43.7248261,-79.3016823,light_rail,TTC
+Oakville,43.455214,-79.6820931,station,GO Transit
+Oakwood,43.6973138,-79.4427369,light_rail,Eglinton Crosstown LRT
+Old Cummer,43.7936472,-79.3713948,station,GO Transit
+Old Elm,43.9902275,-79.2373394,station,GO Transit
+Old Mill,43.649826,-79.4943338,subway,Toronto Transit Commission
+Oriole,43.765498,-79.3642688,station,GO Transit
+Osgoode,43.6508016,-79.3865409,subway,Toronto Transit Commission
+Oshawa,43.8712112,-78.8848961,station,GO Transit
+Ossington,43.6623783,-79.42633,subway,Toronto Transit Commission
+Pape,43.6799212,-79.3449046,subway,Toronto Transit Commission
+Pearldale,43.7476892,-79.5629559,light_rail,Toronto Transit Commission
+Pharmacy,43.7258445,-79.2966347,light_rail,
+Pickering,43.8314632,-79.0844135,station,GO Transit
+Pioneer Village,43.7768588,-79.5092824,subway,Toronto Transit Commission
+Port Credit,43.5560546,-79.5870828,station,Alstom
+Queen,43.6529083,-79.3794575,subway,Toronto Transit Commission
+Queen's Park,43.6596838,-79.3901923,subway,Toronto Transit Commission
+Richmond Hill,43.8747978,-79.4266122,station,GO Transit
+Rosedale,43.6764527,-79.3884459,subway,Toronto Transit Commission
+Rouge Hill,43.7802711,-79.1304992,station,Alstom
+Rowntree Mills,43.7462218,-79.5685629,light_rail,Toronto Transit Commission
+Royal York,43.6481827,-79.5112961,subway,Toronto Transit Commission
+Runnymede,43.6517026,-79.4759978,subway,Toronto Transit Commission
+Rutherford,43.8382001, -79.4991049,station,GO Transit
+Scarborough,43.7169869,-79.2546806,station,Alstom
+Scarborough Centre,43.7743918,-79.2580418,light_rail,Toronto Transit Commission
+Sentinel,43.7610537,-79.500013,light_rail,Toronto Transit Commission
+Sheppard West,43.7492988,-79.462248,subway,Toronto Transit Commission
+Sheppard-Yonge,43.7614518,-79.4109148,subway,Toronto Transit Commission
+Sherbourne,43.6722828,-79.376394,subway,Toronto Transit Commission
+Signet Arrow,43.7532955,-79.5361882,light_rail,Toronto Transit Commission
+Sloane,43.7258943,-79.3126007,light_rail,
+South Simcoe Railroad,44.0227203,-79.8079331,station,
+Spadina,43.6685404,-79.4047039,subway,Toronto Transit Commission
+St. Andrew,43.6477917,-79.3848711,subway,Toronto Transit Commission
+St. Catharines,43.1477335,-79.2559921,station,VIA Rail;GO Transit
+St. Clair,43.6879512,-79.3936947,subway,Toronto Transit Commission
+St. Clair West,43.6850034,-79.4153079,subway,Toronto Transit Commission
+St. George,43.6684387,-79.398844,subway,Toronto Transit Commission
+St. Patrick,43.6548199,-79.3882736,subway,Toronto Transit Commission
+Stevenson,43.7432573,-79.5865726,light_rail,Toronto Transit Commission
+Stouffville,43.9709347,-79.2500049,station,GO Transit
+Stratford,43.3647079,-80.9754839,station,VIA Rail
+Streetsville,43.5761899,-79.7089736,station,GO Transit
+Summer Best,42.9047141,-78.8680902,light_rail,Niagara Frontier Transportation Authority
+Summerhill,43.6816776,-79.3905037,subway,Toronto Transit Commission
+Sunnybrook Park,43.7173292,-79.349031,light_rail,
+Sweet Home,42.9973349,-78.7991737,light_rail,Niagra Frontier Transportation Authority
+TMU,43.6565367,-79.3810223,subway,Toronto Transit Commission
+Terminal 1,43.6825791,-79.6127699,monorail,Terminal Link Train
+Terminal 3,43.6861625,-79.6199591,monorail,Terminal Link Train
+Tobermory,43.7592824,-79.5079134,light_rail,Toronto Transit Commission
+Toronto Pearson Terminal 1,43.6830012,-79.613438,station,UP Express
+Toronto Union Station,43.6445345,-79.380381,station,Toronto Transit Commission
+Union,43.6456424,-79.3802085,subway,Toronto Transit Commission
+Unionville,43.8518739,-79.3143319,station,GO Transit
+University,42.9545956,-78.8201959,light_rail,Niagara Frontier Transportation Authority
+Utica,42.9115398,-78.8657932,light_rail,Niagara Frontier Transportation Authority
+Vaughan Metropolitan Centre,43.7942413,-79.5274638,subway,Toronto Transit Commission
+Victoria Park,43.6948799,-79.2887965,subway,Toronto Transit Commission
+Viscount,43.6898667,-79.6157729,monorail,Terminal Link Train
+Warden,43.7111204,-79.2790432,subway,Toronto Transit Commission
+Wellesley,43.6655242,-79.3838011,subway,Toronto Transit Commission
+West Harbour,43.2666386,-79.866122,station,GO Transit
+Westmore,43.7348147,-79.6003652,light_rail,Toronto Transit Commission
+Weston,43.7000465,-79.5127589,station,GO Transit;UP Express
+Whitby,43.8648854,-78.9385066,station,GO Transit
+Wilson,43.7344762,-79.4500619,subway,Toronto Transit Commission
+Woodbine,43.6864139,-79.3126246,subway,Toronto Transit Commission
+Wynford,43.7240472,-79.3267322,light_rail,
+York Mills,43.7440375,-79.4060726,subway,Toronto Transit Commission
+York University,43.7741232,-79.4996291,subway,Toronto Transit Commission
+Yorkdale,43.7246418,-79.4475031,subway,Toronto Transit Commission
+,,,,

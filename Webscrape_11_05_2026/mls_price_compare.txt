@@ -1,0 +1,109 @@
+Total valid price entries:             13,496
+Count WITH MLS Number:                 7,210
+Count WITHOUT MLS Number:              6,286
+
+==================================================
+--- WITH MLS NUMBER ---
+==================================================
+[LEVEL 1: Original Filtered Dataset]
+Count:                                 7,210
+Average (Mean) Price:                  $2,876.78
+Median Price:                          $2,550.00
+Minimum Price:                         $600.00
+Maximum Price:                         $28,000.00
+Max Price URL:                         https://www.kijiji.ca/v-apartments-condos/city-of-toronto/370-glengrove-avenue-w-toronto-lawrence-park-south-ontario/1736010247
+Range:                                 $27,400.00
+Variance:                              $2,895,494.32
+Standard Deviation:                    $1,701.62
+Q1 (25th Percentile):                  $2,050.00
+Q3 (75th Percentile):                  $3,200.00
+IQR (Interquartile Range):             $1,150.00
+1.5x IQR Fence [Lower, Upper]:         [$325.00, $4,925.00]
+  - Low Outliers (< Lower):            0
+  - High Outliers (> Upper):           399
+3.0x IQR Fence [Lower, Upper]:         [$-1,400.00, $6,650.00]
+  - Low Extreme Outliers (< Lower):    0
+  - High Extreme Outliers (> Upper):   179
+Mean Absolute Deviation (MAD):         $932.44
+Median Absolute Deviation (MedAD):       $550.50
+
+[LEVEL 2: Extreme Outliers Removed (3.0x IQR)]
+Entries Remaining:                     7,031
+Average (Mean) Price:                  $2,676.23
+Median Price:                          $2,500.00
+Minimum Price:                         $600.00
+Maximum Price:                         $6,640.00
+Range:                                 $6,040.00
+Variance:                              $886,759.96
+Standard Deviation:                    $941.68
+Mean Absolute Deviation (MAD):         $711.34
+Median Absolute Deviation (MedAD):       $510.00
+
+[LEVEL 3: All Outliers Removed (1.5x IQR)]
+Entries Remaining:                     6,811
+Average (Mean) Price:                  $2,580.69
+Median Price:                          $2,500.00
+Minimum Price:                         $600.00
+Maximum Price:                         $4,925.00
+Range:                                 $4,325.00
+Variance:                              $616,334.44
+Standard Deviation:                    $785.07
+Mean Absolute Deviation (MAD):         $626.00
+Median Absolute Deviation (MedAD):       $500.00
+
+==================================================
+--- WITHOUT MLS NUMBER ---
+==================================================
+[LEVEL 1: Original Filtered Dataset]
+Count:                                 6,286
+Average (Mean) Price:                  $2,042.27
+Median Price:                          $1,900.00
+Minimum Price:                         $370.00
+Maximum Price:                         $18,550.00
+Max Price URL:                         https://www.kijiji.ca/v-apartments-condos/mississauga-peel-region/apartment-for-rent/1744828336
+Range:                                 $18,180.00
+Variance:                              $745,462.49
+Standard Deviation:                    $863.40
+Q1 (25th Percentile):                  $1,600.00
+Q3 (75th Percentile):                  $2,450.00
+IQR (Interquartile Range):             $850.00
+1.5x IQR Fence [Lower, Upper]:         [$325.00, $3,725.00]
+  - Low Outliers (< Lower):            0
+  - High Outliers (> Upper):           157
+3.0x IQR Fence [Lower, Upper]:         [$-950.00, $5,000.00]
+  - Low Extreme Outliers (< Lower):    0
+  - High Extreme Outliers (> Upper):   26
+Mean Absolute Deviation (MAD):         $583.85
+Median Absolute Deviation (MedAD):       $400.00
+
+[LEVEL 2: Extreme Outliers Removed (3.0x IQR)]
+Entries Remaining:                     6,260
+Average (Mean) Price:                  $2,015.62
+Median Price:                          $1,900.00
+Minimum Price:                         $370.00
+Maximum Price:                         $5,000.00
+Range:                                 $4,630.00
+Variance:                              $516,568.25
+Standard Deviation:                    $718.73
+Mean Absolute Deviation (MAD):         $555.70
+Median Absolute Deviation (MedAD):       $400.00
+
+[LEVEL 3: All Outliers Removed (1.5x IQR)]
+Entries Remaining:                     6,129
+Average (Mean) Price:                  $1,970.35
+Median Price:                          $1,900.00
+Minimum Price:                         $370.00
+Maximum Price:                         $3,700.00
+Range:                                 $3,330.00
+Variance:                              $427,203.65
+Standard Deviation:                    $653.61
+Mean Absolute Deviation (MAD):         $517.07
+Median Absolute Deviation (MedAD):       $400.00
+
+==================================================
+--- COMPARISON SUMMARY ---
+==================================================
+Level 1 Mean Diff (With - Without):    $834.51
+Level 2 Mean Diff (With - Without):    $660.61
+Level 3 Mean Diff (With - Without):    $610.34
+Level 1 Median Diff (With - Without):  $650.00

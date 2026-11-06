@@ -1,0 +1,20 @@
+Total URLs containing common car brand names: 18
+
+https://www.kijiji.ca/v-apartments-condos/mississauga-peel-region/lower-162-cadillac-crescent-brampton-fletchers-meadow-onta/1745459321
+https://www.kijiji.ca/v-apartments-condos/mississauga-peel-region/408-3151-jaguar-valley-drive-mississauga-cooksville-ontario/1745331997
+https://www.kijiji.ca/v-apartments-condos/mississauga-peel-region/308-3151-jaguar-valley-drive-mississauga-cooksville-ontario/1745288827
+https://www.kijiji.ca/v-apartments-condos/markham-york-region/2021-mercedes-benz-glc-300-no-accident-amg-pkg-pano-roof-360-cam/1745696689
+https://www.kijiji.ca/v-apartments-condos/markham-york-region/83-lincoln-green-drive-markham-bullock-ontario/1742939751
+https://www.kijiji.ca/v-apartments-condos/city-of-toronto/furnished-studio-with-mini-kitchen-basement-at-yonge-and-finch/1745594671
+https://www.kijiji.ca/v-apartments-condos/oakville-halton-region/2048-devon-road-oakville-fd-ford-ontario/1741623514
+https://www.kijiji.ca/v-apartments-condos/oakville-halton-region/2279-dunedin-road-oakville-fd-ford-ontario/1745673853
+https://www.kijiji.ca/v-apartments-condos/oakville-halton-region/2365-baccaro-road-oakville-fd-ford-ontario/1745418671
+https://www.kijiji.ca/v-apartments-condos/oakville-halton-region/2042-constance-drive-oakville-fd-ford-ontario/1745416427
+https://www.kijiji.ca/v-apartments-condos/oakville-halton-region/2100-dunvegan-avenue-oakville-fd-ford-ontario/1745243577
+https://www.kijiji.ca/v-apartments-condos/oakville-halton-region/2290-devon-road-oakville-fd-ford-ontario/1735020436
+https://www.kijiji.ca/v-apartments-condos/oakville-halton-region/121-castle-crescent-oakville-fd-ford-ontario/1745112443
+https://www.kijiji.ca/v-apartments-condos/oakville-halton-region/281-pinehurst-drive-oakville-fd-ford-ontario/1743619923
+https://www.kijiji.ca/v-apartments-condos/oakville-halton-region/193-chebucto-drive-oakville-fd-ford-ontario/1744751426
+https://www.kijiji.ca/v-apartments-condos/oakville-halton-region/193-chebucto-drive-e-oakville-fd-ford-ontario/1744664915
+https://www.kijiji.ca/v-apartments-condos/oakville-halton-region/2306-devon-road-oakville-fd-ford-ontario/1744578547
+https://www.kijiji.ca/v-apartments-condos/oakville-halton-region/unit-1-319-beechfield-road-oakville-fd-ford-ontario/1741670831
