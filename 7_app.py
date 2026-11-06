@@ -3,7 +3,6 @@ import sys
 import json
 import joblib
 import numpy as np
-import torch
 from flask import Flask, render_template, request, session
 from sklearn.base import BaseEstimator, RegressorMixin
 
@@ -49,17 +48,15 @@ class TargetScaledRegressor(BaseEstimator, RegressorMixin):
             return preds
         return np.zeros(len(X))
 
-# Register both wrappers in __main__ module for joblib/pickle lookup compatibility
+# Register wrappers in __main__ module for joblib/pickle lookup compatibility
 sys.modules['__main__'].ScaledModelWrapper = ScaledModelWrapper
 sys.modules['__main__'].TargetScaledRegressor = TargetScaledRegressor
 
 # ==========================================
 # CONFIGURATION SWITCH & DEFAULTS
 # ==========================================
-# Default fallback mode:
-# Set to True  --> Default to multi-model setup (model_apartment/, model_condo/, etc.)
-# Set to False --> Default to single unified model setup (/models)
 DEFAULT_USE_MULTI_MODEL = False
+DEFAULT_UNIT_TYPES = ['Apartment', 'Basement', 'Condo', 'Duplex/Triplex', 'House', 'Townhouse']
 
 def calculate_haversine_distance(lat, lon, center_lat=43.651070, center_lon=-79.347015):
     """Calculates geodesic distance (in kilometers) between coordinates and city center."""
@@ -99,31 +96,34 @@ def clean_unit_key(unit_name):
     return unit_name.lower().replace('/', '_').replace(' ', '_')
 
 app = Flask(__name__)
-app.secret_key = 'rental_valuation_predictor_secret_key'
+app.secret_key = os.environ.get('SECRET_KEY', 'rental_valuation_predictor_secret_key')
 
-DEFAULT_UNIT_TYPES = ['Apartment', 'Basement', 'Condo', 'Duplex/Triplex', 'House', 'Townhouse']
-
-# Global container holding both unified and multi-model artifacts
+# Global container holding both unified and multi-model metadata/cache
 LOADED_DATA = {
     'unified_data': {},
-    'multi_data': {}
+    'multi_data': {
+        'units': {},
+        'unit_options': [],
+        'model_options': []
+    }
 }
 
 def load_models_from_dir(folder_path, meta):
-    """Helper to load PyTorch and Sklearn models defined in models_map."""
+    """Helper to load pure Sklearn models defined in models_map."""
     models = {}
     models_map = meta.get('models_map', {})
     for model_display_name, filename in models_map.items():
         file_path = os.path.join(folder_path, filename)
         if os.path.exists(file_path):
-            if filename.endswith('.pt'):
-                models[model_display_name] = torch.jit.load(file_path)
-            else:
-                models[model_display_name] = joblib.load(file_path)
+            models[model_display_name] = joblib.load(file_path)
     return models
 
-def load_application_artifacts():
-    """Loads scalers, metadata, and models for BOTH single unified setup (/models) and multi-model setup (model_*/)."""
+def initialize_application_artifacts():
+    """
+    Startup initialization:
+    1. Pre-loads the unified model (/models) completely into RAM.
+    2. Scans multi-model metadata (/model_*) WITHOUT loading model binaries into RAM.
+    """
     global LOADED_DATA
 
     # 1. Load Single Unified Model Artifacts (from /models)
@@ -145,10 +145,10 @@ def load_application_artifacts():
             'unit_options': unit_options,
             'model_options': sorted(list(models.keys()))
         }
-        print("[App Setup] Unified model loaded from 'models/'")
+        print("[App Setup] Pre-loaded Unified Model into RAM from 'models/'")
 
-    # 2. Load Multi-Model Artifacts (from model_apartment/, model_condo/, etc.)
-    multi_data = {}
+    # 2. Metadata-only Scan for Multi-Models (No heavy model loading)
+    multi_units = {}
     available_units = []
     all_model_names = set()
 
@@ -156,31 +156,48 @@ def load_application_artifacts():
         key = clean_unit_key(unit)
         folder_path = f"model_{key}"
         meta_p = os.path.join(folder_path, 'feature_meta.json')
-        scaler_p = os.path.join(folder_path, 'scaler.pkl')
 
         if os.path.exists(meta_p):
             with open(meta_p, 'r') as f:
                 meta = json.load(f)
-            scaler = joblib.load(scaler_p) if os.path.exists(scaler_p) else None
-            models = load_models_from_dir(folder_path, meta)
-
-            multi_data[key] = {
+            
+            multi_units[key] = {
                 'meta': meta,
-                'scaler': scaler,
-                'models': models
+                'folder_path': folder_path,
+                'scaler': None,  # Lazy loaded on demand
+                'models': None   # Lazy loaded on demand
             }
             available_units.append(unit)
-            all_model_names.update(models.keys())
+            all_model_names.update(meta.get('models_map', {}).keys())
 
-    LOADED_DATA['multi_data'] = {
-        'units': multi_data,
-        'unit_options': available_units if available_units else DEFAULT_UNIT_TYPES,
-        'model_options': sorted(list(all_model_names))
-    }
-    print(f"[App Setup] Multi-models loaded from 'model_*/' ({len(available_units)} unit types)")
+    LOADED_DATA['multi_data']['units'] = multi_units
+    LOADED_DATA['multi_data']['unit_options'] = available_units if available_units else DEFAULT_UNIT_TYPES
+    LOADED_DATA['multi_data']['model_options'] = sorted(list(all_model_names))
+    print(f"[App Setup] Scanned metadata for {len(available_units)} unit type multi-models (Lazy Loading ready)")
 
-# Initialize artifact loading after custom class registration
-load_application_artifacts()
+# Initialize metadata on startup
+initialize_application_artifacts()
+
+def get_lazy_multi_unit_artifact(unit_key):
+    """Lazy loader: loads unit-specific scaler and model binary into RAM on demand."""
+    unit_entry = LOADED_DATA['multi_data']['units'].get(unit_key)
+    if not unit_entry:
+        return None
+
+    if unit_entry['models'] is None:
+        folder_path = unit_entry['folder_path']
+        meta = unit_entry['meta']
+        scaler_path = os.path.join(folder_path, 'scaler.pkl')
+
+        print(f"[Lazy Load] Loading binary model artifacts into RAM for unit: '{unit_key}'...")
+        scaler = joblib.load(scaler_path) if os.path.exists(scaler_path) else None
+        models = load_models_from_dir(folder_path, meta)
+
+        unit_entry['scaler'] = scaler
+        unit_entry['models'] = models
+        print(f"[Lazy Load] Unit '{unit_key}' successfully loaded into memory.")
+
+    return unit_entry
 
 def get_mode_data(use_multi):
     """Retrieves metadata, unit options, and model options for the active mode."""
@@ -196,7 +213,6 @@ def index():
     use_multi = parse_binary(request.args.get('use_multi_model', 1 if DEFAULT_USE_MULTI_MODEL else 0))
     unit_options, model_options = get_mode_data(use_multi)
     
-    # Retrieve cached form inputs from session memory and merge with URL query parameters
     cached_form = session.get('form_data', {})
     query_params = request.args.to_dict()
     
@@ -226,17 +242,15 @@ def predict():
     try:
         data = request.form.to_dict()
         unit_options, model_options = get_mode_data(use_multi)
-
         session['form_data'] = data
 
-        # 1. Parse dropdown inputs
         selected_unit = data.get('unittype', unit_options[0] if unit_options else 'Apartment')
         selected_model_name = data.get('model_choice', model_options[0] if model_options else '')
 
-        # 2. Retrieve appropriate Scaler, Model, and Metadata based on active mode
+        # Retrieve Scaler, Model, and Metadata using Lazy Loading for multi-mode
         if use_multi:
             unit_key = clean_unit_key(selected_unit)
-            unit_artifact = LOADED_DATA['multi_data']['units'].get(unit_key)
+            unit_artifact = get_lazy_multi_unit_artifact(unit_key)
             if not unit_artifact:
                 raise ValueError(f"No trained multi-model found for unit type '{selected_unit}'.")
             meta = unit_artifact['meta']
@@ -253,7 +267,6 @@ def predict():
         target_model = loaded_models[selected_model_name]
         feature_names = meta.get('feature_names', [])
 
-        # 3. Core numeric inputs
         listed_price = float(data.get('price', 0))
         area = float(data.get('areainfeet', meta.get('median_area', 800)))
         bedrooms = float(data.get('bedrooms_num', 1))
@@ -264,7 +277,6 @@ def predict():
 
         dist_to_center_km = calculate_haversine_distance(lat, lon)
 
-        # 4. Policy & Lease terms
         pets_selection = data.get('pets_allowed_policy', 'no').lower().strip()
         pets_no = 1 if pets_selection == 'no' else 0
         pets_limited = 1 if pets_selection == 'limited' else 0
@@ -296,7 +308,6 @@ def predict():
             'mls_number_bin': parse_binary(data.get('mls_number_bin', 0)),
         }
 
-        # 5. One-Hot Encoding for Unit Type
         unit_values = {}
         for col in feature_names:
             if col.startswith('unit_'):
@@ -318,26 +329,17 @@ def predict():
         }
 
         feature_vector = np.array([[input_dict.get(col, 0.0) for col in feature_names]], dtype=np.float32)
-
-        # 6. Feature scaling & inference
         scaled_input = scaler.transform(feature_vector) if scaler else feature_vector
 
-        if isinstance(target_model, (torch.jit.ScriptModule, torch.nn.Module)):
-            target_model.eval()
-            with torch.no_grad():
-                tensor_input = torch.tensor(scaled_input, dtype=torch.float32)
-                raw_pred = target_model(tensor_input).detach().cpu().numpy()
+        # Feature weighting applied specifically for k-NN distance metrics
+        if 'knn' in selected_model_name.lower() or 'k-nn' in selected_model_name.lower():
+            model_input = apply_feature_weights(scaled_input, feature_names)
         else:
-            # Apply feature weighting specifically for k-NN distance metrics
-            if 'knn' in selected_model_name.lower() or 'k-nn' in selected_model_name.lower():
-                model_input = apply_feature_weights(scaled_input, feature_names)
-            else:
-                model_input = scaled_input
-            raw_pred = target_model.predict(model_input)
+            model_input = scaled_input
 
+        raw_pred = target_model.predict(model_input)
         predicted_fair_value = float(np.ravel(raw_pred)[0])
 
-        # 7. Valuation analysis
         residual = listed_price - predicted_fair_value
         magnitude = abs(residual)
         tolerance = 0.08 * predicted_fair_value
@@ -364,7 +366,7 @@ def predict():
             'magnitude': magnitude,
             'summary': summary,
             'color_class': color_class,
-            'mode_label': "Multi-Model Setup" if use_multi else "Single Unified Model (/models)"
+            'mode_label': "Unit Type Model" if use_multi else "Unified Model"
         }
 
         return render_template(
@@ -396,4 +398,5 @@ def predict():
         )
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5050)
+    port = int(os.environ.get('PORT', 5050))
+    app.run(host='0.0.0.0', port=port, debug=False)

@@ -30,14 +30,14 @@
             <div>
                 <strong class="text-secondary">Architecture Setup:</strong>
                 <span class="badge {% if use_multi_model %}bg-success{% else %}bg-primary{% endif %} ms-2 fs-6">
-                    {% if use_multi_model %}Model by Unit Type{% else %}Unified Model{% endif %}
+                    {% if use_multi_model %}Unit Type Model{% else %}Unified Model{% endif %}
                 </span>
             </div>
             <div class="form-check form-switch fs-5 mb-0">
                 <input class="form-check-input" type="checkbox" role="switch" id="multiModelToggle" 
                        {% if use_multi_model %}checked{% endif %} onchange="toggleMode(this)">
                 <label class="form-check-label fs-6 fw-bold" for="multiModelToggle">
-                    Enable Model by Unit Type
+                    Enable Unit Type Model
                 </label>
             </div>
         </div>
@@ -235,19 +235,30 @@
                             </select>
                         </div>
                         <div class="col-md-4 mb-3">
-                            <label for="yard_bin" class="form-label">Yard / Garden</label>
+                            <label for="yard_bin" class="form-label">Yard</label>
                             <select class="form-select" id="yard_bin" name="yard_bin">
                                 <option value="0" {% if not form_data or form_data.get('yard_bin') == '0' %}selected{% endif %}>No</option>
                                 <option value="1" {% if form_data and form_data.get('yard_bin') == '1' %}selected{% endif %}>Yes</option>
                             </select>
                         </div>
                     </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="mls_number_bin" class="form-label">MLS Listing</label>
+                            <select class="form-select" id="mls_number_bin" name="mls_number_bin">
+                                <option value="0" {% if not form_data or form_data.get('mls_number_bin') == '0' %}selected{% endif %}>No</option>
+                                <option value="1" {% if form_data and form_data.get('mls_number_bin') == '1' %}selected{% endif %}>Yes</option>
+                            </select>
+                        </div>
+                    </div>
 
-                    <button type="submit" class="btn btn-primary btn-lg w-100 mt-3">Evaluate Valuation</button>
+                    <button type="submit" class="btn btn-primary w-100 btn-lg mt-3 fw-bold">Evaluate Valuation</button>
                 </form>
             </div>
         </div>
 
+        <!-- RIGHT COLUMN: VALUATION RESULTS -->
         <!-- RIGHT COLUMN: VALUATION RESULT CONTAINER -->
         <div class="col-lg-5">
             <div class="sticky-top" style="top: 20px;">
@@ -277,12 +288,10 @@
 </div>
 
 <script>
-function toggleMode(toggleElement) {
-    const isMulti = toggleElement.checked ? '1' : '0';
-    document.getElementById('use_multi_model_input').value = isMulti;
-    window.location.href = '/?use_multi_model=' + isMulti;
-}
+    function toggleMode(checkbox) {
+        const useMulti = checkbox.checked ? 1 : 0;
+        window.location.href = '/?use_multi_model=' + useMulti;
+    }
 </script>
-
 </body>
 </html>
