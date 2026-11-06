@@ -8,12 +8,30 @@ from flask import Flask, render_template, request, session
 from sklearn.base import BaseEstimator, RegressorMixin
 
 # ==========================================
-# CUSTOM CLASS DEFINITION FOR UNPICKLING
+# CUSTOM CLASS DEFINITIONS FOR UNPICKLING
 # ==========================================
+class ScaledModelWrapper(BaseEstimator, RegressorMixin):
+    """
+    Custom wrapper used when unpickling target-scaled sklearn models.
+    Inverse-transforms scaled target predictions back to original values ($).
+    """
+    def __init__(self, model=None, mean=0.0, std=1.0):
+        self.model = model
+        self.mean = float(mean)
+        self.std = float(std)
+
+    def fit(self, X, y):
+        return self
+
+    def predict(self, X):
+        if hasattr(self, 'model') and self.model is not None:
+            preds = self.model.predict(X)
+            return preds * self.std + self.mean
+        return np.zeros(len(X))
+
 class TargetScaledRegressor(BaseEstimator, RegressorMixin):
     """
-    Custom regressor wrapper required by joblib to unpickle saved models 
-    that were trained using target scaling.
+    Legacy target scaling regressor wrapper for backwards compatibility.
     """
     def __init__(self, regressor=None, scaler=None):
         self.regressor = regressor
@@ -31,7 +49,8 @@ class TargetScaledRegressor(BaseEstimator, RegressorMixin):
             return preds
         return np.zeros(len(X))
 
-# Register TargetScaledRegressor in __main__ module for joblib/pickle lookup
+# Register both wrappers in __main__ module for joblib/pickle lookup compatibility
+sys.modules['__main__'].ScaledModelWrapper = ScaledModelWrapper
 sys.modules['__main__'].TargetScaledRegressor = TargetScaledRegressor
 
 # ==========================================
@@ -59,8 +78,10 @@ def apply_feature_weights(X_scaled, feature_names):
             weights[i] = 3.5
         elif name in ['areainfeet', 'bedrooms_num', 'bathrooms_num']:
             weights[i] = 2.5
-        elif name in ['lat', 'lon', 'dist_to_center_km', 'parking_spots_num']:
+        elif name in ['lat', 'lon', 'dist_to_center_km', 'parking_spots_num', 'walkscore', 'transitscore', 'bikescore']:
             weights[i] = 2.0
+        elif name == 'mls_number_bin':
+            weights[i] = 0.5
         elif name in ['pets_no', 'pets_limited', 'pets_yes', 'smoking_no', 'smoking_outdoors', 'smoking_yes']:
             weights[i] = 1.0
         elif name.endswith('_bin'):
@@ -122,7 +143,7 @@ def load_application_artifacts():
             'scaler': scaler,
             'models': models,
             'unit_options': unit_options,
-            'model_options': sorted(list(models.keys()))  # Standardized sorting
+            'model_options': sorted(list(models.keys()))
         }
         print("[App Setup] Unified model loaded from 'models/'")
 
@@ -154,11 +175,11 @@ def load_application_artifacts():
     LOADED_DATA['multi_data'] = {
         'units': multi_data,
         'unit_options': available_units if available_units else DEFAULT_UNIT_TYPES,
-        'model_options': sorted(list(all_model_names))  # Standardized sorting
+        'model_options': sorted(list(all_model_names))
     }
     print(f"[App Setup] Multi-models loaded from 'model_*/' ({len(available_units)} unit types)")
 
-# Initialize artifact loading after TargetScaledRegressor registration
+# Initialize artifact loading after custom class registration
 load_application_artifacts()
 
 def get_mode_data(use_multi):
@@ -179,14 +200,12 @@ def index():
     cached_form = session.get('form_data', {})
     query_params = request.args.to_dict()
     
-    # Merge query parameters over cached form inputs
     form_data = {**cached_form, **query_params}
     form_data['use_multi_model'] = str(use_multi)
     session['form_data'] = form_data
     
     selected_unit = form_data.get('unittype', unit_options[0] if unit_options else 'Apartment')
     
-    # Preserve model selection if available in current mode options
     selected_model_name = form_data.get('model_choice', '')
     if selected_model_name not in model_options and model_options:
         selected_model_name = model_options[0]
@@ -208,7 +227,6 @@ def predict():
         data = request.form.to_dict()
         unit_options, model_options = get_mode_data(use_multi)
 
-        # Cache inputs in session storage
         session['form_data'] = data
 
         # 1. Parse dropdown inputs
@@ -275,9 +293,10 @@ def predict():
             'heat_bin': parse_binary(data.get('heat_bin', 0)),
             'water_bin': parse_binary(data.get('water_bin', 0)),
             'agreement_1yr_bin': parse_binary(data.get('agreement_1yr_bin', 0)),
+            'mls_number_bin': parse_binary(data.get('mls_number_bin', 0)),
         }
 
-        # 5. One-Hot Encoding for Unit Type (Only active if present in feature_names)
+        # 5. One-Hot Encoding for Unit Type
         unit_values = {}
         for col in feature_names:
             if col.startswith('unit_'):
@@ -309,8 +328,12 @@ def predict():
                 tensor_input = torch.tensor(scaled_input, dtype=torch.float32)
                 raw_pred = target_model(tensor_input).detach().cpu().numpy()
         else:
-            weighted_input = apply_feature_weights(scaled_input, feature_names)
-            raw_pred = target_model.predict(weighted_input)
+            # Apply feature weighting specifically for k-NN distance metrics
+            if 'knn' in selected_model_name.lower() or 'k-nn' in selected_model_name.lower():
+                model_input = apply_feature_weights(scaled_input, feature_names)
+            else:
+                model_input = scaled_input
+            raw_pred = target_model.predict(model_input)
 
         predicted_fair_value = float(np.ravel(raw_pred)[0])
 
