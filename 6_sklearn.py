@@ -411,8 +411,8 @@ def process_unit_type(unittype_name, csv_filename, models_dir="models", images_d
     else:
         kf = KFold(n_splits=n_splits, shuffle=True, random_state=42)
         cv_models = {
-            'Linear Baseline (Sklearn)': None,
-            'k-NN Tree-Based: KD-Tree (Sklearn)': None,
+            'Linear Regression': None,
+            'k-NN Tree-Based: KD-Tree': None,
             'Feedforward Neural Network MLP (Sklearn)': None
         }
         
@@ -429,19 +429,19 @@ def process_unit_type(unittype_name, csv_filename, models_dir="models", images_d
             X_tr_wt = apply_feature_weights(X_tr_sc, feature_names)
             X_va_wt = apply_feature_weights(X_va_sc, feature_names)
 
-            # Linear Baseline
+            # Linear Regression
             m_log, _, _ = train_sklearn_iterative(m_lin_base, X_tr_sc, y_tr, X_va_sc, y_va, epochs=150, batch_size=128, is_scaled=False)
-            oof_predictions['Linear Baseline (Sklearn)'][val_idx] = predict_model(m_log, X_va_sc)
+            oof_predictions['Linear Regression'][val_idx] = predict_model(m_log, X_va_sc)
 
             # KNN
             knn_cv = KNeighborsRegressor(n_neighbors=min(7, max(1, len(X_tr)-1)), weights='distance', algorithm='kd_tree', n_jobs=-1).fit(X_tr_wt, y_tr)
-            oof_predictions['k-NN Tree-Based: KD-Tree (Sklearn)'][val_idx] = np.maximum(knn_cv.predict(X_va_wt), 0.0)
+            oof_predictions['k-NN Tree-Based: KD-Tree'][val_idx] = np.maximum(knn_cv.predict(X_va_wt), 0.0)
 
             # MLP Target-Scaled
             m_mlp, _, _ = train_sklearn_iterative(m_mlp_scaled_base, X_tr_sc, y_tr, X_va_sc, y_va, epochs=400, batch_size=128, is_scaled=True)
             oof_predictions['Feedforward Neural Network MLP (Sklearn)'][val_idx] = predict_model(m_mlp, X_va_sc)
 
-        consensus_fair_value = (oof_predictions['k-NN Tree-Based: KD-Tree (Sklearn)'] + oof_predictions['Feedforward Neural Network MLP (Sklearn)']) / 2.0
+        consensus_fair_value = (oof_predictions['k-NN Tree-Based: KD-Tree'] + oof_predictions['Feedforward Neural Network MLP (Sklearn)']) / 2.0
         y_true_class = classify_valuation(y, consensus_fair_value, threshold=0.10)
 
         print("\n" + "=" * 80)
@@ -490,11 +490,11 @@ def process_unit_type(unittype_name, csv_filename, models_dir="models", images_d
 
     model_lin_orig, tr_h1, val_h1 = train_sklearn_iterative(m_lin_base, X_tr_scaled, y_tr, X_val_scaled, y_val, epochs=150, is_scaled=False)
     pred_lin_orig = predict_model(model_lin_orig, X_val_scaled)
-    histories['Linear Baseline Original (Sklearn)'] = {'train': tr_h1, 'val': val_h1}
+    histories['Linear Regression'] = {'train': tr_h1, 'val': val_h1}
 
     model_lin_scaled, tr_h2, val_h2 = train_sklearn_iterative(m_lin_scaled_base, X_tr_scaled, y_tr, X_val_scaled, y_val, epochs=200, is_scaled=True)
     pred_lin_scaled = predict_model(model_lin_scaled, X_val_scaled)
-    histories['Linear Baseline (Target-Scaled Sklearn)'] = {'train': tr_h2, 'val': val_h2}
+    histories['Linear Regression (Target-Scaled)'] = {'train': tr_h2, 'val': val_h2}
 
     n_neighbors = min(7, max(1, len(X_tr)-1))
     knn_kd = KNeighborsRegressor(n_neighbors=n_neighbors, weights='distance', algorithm='kd_tree', n_jobs=-1).fit(X_tr_weighted, y_tr)
@@ -502,18 +502,18 @@ def process_unit_type(unittype_name, csv_filename, models_dir="models", images_d
 
     model_mlp_orig, tr_h4, val_h4 = train_sklearn_iterative(m_mlp_base, X_tr_scaled, y_tr, X_val_scaled, y_val, epochs=500, is_scaled=False)
     pred_mlp_orig = predict_model(model_mlp_orig, X_val_scaled)
-    histories['Feedforward Neural Network MLP Original (Sklearn)'] = {'train': tr_h4, 'val': val_h4}
+    histories['Feedforward Neural Network MLP'] = {'train': tr_h4, 'val': val_h4}
 
     model_mlp_scaled, tr_h5, val_h5 = train_sklearn_iterative(m_mlp_scaled_base, X_tr_scaled, y_tr, X_val_scaled, y_val, epochs=400, is_scaled=True)
     pred_mlp_scaled = predict_model(model_mlp_scaled, X_val_scaled)
-    histories['Feedforward Neural Network MLP (Target-Scaled Sklearn)'] = {'train': tr_h5, 'val': val_h5}
+    histories['Feedforward Neural Network MLP (Target-Scaled)'] = {'train': tr_h5, 'val': val_h5}
 
     predictions = {
-        'Linear Baseline Original (Sklearn)': pred_lin_orig,
-        'Linear Baseline (Target-Scaled Sklearn)': pred_lin_scaled,
-        'k-NN Tree-Based: KD-Tree (Sklearn)': pred_kd,
-        'Feedforward Neural Network MLP Original (Sklearn)': pred_mlp_orig,
-        'Feedforward Neural Network MLP (Target-Scaled Sklearn)': pred_mlp_scaled
+        'Linear Regression': pred_lin_orig,
+        'Linear Regression (Target-Scaled)': pred_lin_scaled,
+        'k-NN Tree-Based: KD-Tree': pred_kd,
+        'Feedforward Neural Network MLP': pred_mlp_orig,
+        'Feedforward Neural Network MLP (Target-Scaled)': pred_mlp_scaled
     }
 
     plot_overfitting_charts(histories, X_tr_weighted, y_tr, X_val_weighted, y_val, images_dir)
@@ -533,11 +533,11 @@ def process_unit_type(unittype_name, csv_filename, models_dir="models", images_d
         'target_location': [43.651070, -79.347015],
         'median_area': float(median_area),
         'models_map': {
-            'Linear Baseline Original (Sklearn)': 'linear_original_sklearn.joblib',
-            'Linear Baseline (Target-Scaled Sklearn)': 'linear_scaled_sklearn.joblib',
-            'k-NN Tree-Based: KD-Tree (Sklearn)': 'knn_kd_tree.joblib',
-            'Feedforward Neural Network MLP Original (Sklearn)': 'mlp_original_sklearn.joblib',
-            'Feedforward Neural Network MLP (Target-Scaled Sklearn)': 'mlp_scaled_sklearn.joblib'
+            'Linear Regression': 'linear_original_sklearn.joblib',
+            'Linear Regression (Target-Scaled)': 'linear_scaled_sklearn.joblib',
+            'k-NN Tree-Based: KD-Tree': 'knn_kd_tree.joblib',
+            'Feedforward Neural Network MLP': 'mlp_original_sklearn.joblib',
+            'Feedforward Neural Network MLP (Target-Scaled)': 'mlp_scaled_sklearn.joblib'
         }
     }
     with open(os.path.join(models_dir, 'feature_meta.json'), 'w') as f:
