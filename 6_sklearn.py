@@ -150,8 +150,8 @@ def load_and_preprocess_data(csv_path):
 
     # Standardizing Binary Amenities
     standard_amenity_cols = [
-        'heat', 'hydro', 'water', 
-        'airconditioning', 'dishwasher', 'fridge-freezer', 'laundryinunit', 'laundryinbuilding', 
+        'heat', 'hydro', 'water',
+        'airconditioning', 'dishwasher', 'fridge-freezer', 'laundryinunit', 'laundryinbuilding',
         'balcony', 'yard', 'bicycleparking',
         'internet', 'cabletv', 'furnished', 'concierge', 'twentyfourhoursecurity', 'elevator', 'gym', 'pool', 'storagelocker',
         'accessiblewashroomsinsuite', 'audioprompts', 'barrierfreeentrancesandramps', 'braillelabels', 'visualaids', 'wheelchairaccessible'
@@ -169,7 +169,7 @@ def load_and_preprocess_data(csv_path):
 
     # Base continuous numerical features
     base_numeric_cols = [
-        'areainfeet', 'lat', 'lon', 'dist_to_center_km', 
+        'areainfeet', 'lat', 'lon', 'dist_to_center_km',
         'bedrooms_num', 'bathrooms_num', 'parking_spots_num',
         'walkscore', 'transitscore', 'bikescore'
     ]
@@ -187,12 +187,12 @@ def load_and_preprocess_data(csv_path):
     target_y = df_clean[price_col].values.astype(np.float32)
     
     return (
-        X_df, 
-        df_clean, 
-        target_y, 
-        active_binary_cols, 
-        unit_dummies.columns.tolist() if not unit_dummies.empty else [], 
-        [], 
+        X_df,
+        df_clean,
+        target_y,
+        active_binary_cols,
+        unit_dummies.columns.tolist() if not unit_dummies.empty else [],
+        [],
         median_area
     )
 
@@ -221,6 +221,20 @@ def classify_valuation(listed_price, fair_price, threshold=0.10):
     classes[ratio < (1.0 - threshold)] = 0
     classes[ratio > (1.0 + threshold)] = 2
     return classes
+
+def determine_conclusion(train_rmse, test_rmse, avg_dataset_rmse=400.0):
+    """Judges model fit dynamically using RMSE thresholds and the Train/Test Error gap."""
+    gap = test_rmse - train_rmse
+    gap_abs = abs(gap)
+    # overfit: gap too wide
+    if gap_abs > 150.0 or (test_rmse > 0 and gap_abs / test_rmse > 0.35):
+        return "overfit"
+    # underfit: high RMSE and close lines
+    elif test_rmse > avg_dataset_rmse and gap_abs <= 50.0:
+        return "underfit"
+    # good fit
+    else:
+        return "good fit"
 
 # ==========================================
 # SKLEARN TRAINING & INFERENCE HELPERS
@@ -288,13 +302,13 @@ def plot_correlation_heatmap(X_df, y, images_dir):
 
     plt.figure(figsize=(fig_size, int(fig_size * 0.85)))
     sns.heatmap(
-        corr, 
-        annot=True, 
-        fmt='.2f', 
-        cmap='coolwarm', 
-        vmin=-1, 
-        vmax=1, 
-        linewidths=0.5, 
+        corr,
+        annot=True,
+        fmt='.2f',
+        cmap='coolwarm',
+        vmin=-1,
+        vmax=1,
+        linewidths=0.5,
         cbar_kws={'shrink': 0.8},
         annot_kws={'size': max(6, 10 - n_cols // 5)}
     )
@@ -311,6 +325,24 @@ def plot_overfitting_charts(histories, X_tr_weighted, y_train, X_val_weighted, y
         plt.title(f'Overfitting Analysis: {model_name}', fontsize=12, fontweight='bold')
         plt.xlabel('Epochs / Training Iterations', fontsize=10)
         plt.ylabel('RMSE Error ($)', fontsize=10)
+        
+        # Display Final Train RMSE, Final Test RMSE, and Min Test RMSE on the plot
+        final_tr = hist['train'][-1]
+        final_val = hist['val'][-1]
+        min_val = min(hist['val'])
+        metrics_text = (
+            f"Final Train RMSE: ${final_tr:.2f}\n"
+            f"Final Test RMSE:  ${final_val:.2f}\n"
+            f"Min Test RMSE:    ${min_val:.2f}"
+        )
+        plt.text(
+            0.55, 0.50, metrics_text,
+            transform=plt.gca().transAxes,
+            fontsize=10,
+            verticalalignment='center',
+            bbox=dict(boxstyle='round', facecolor='white', alpha=0.9)
+        )
+
         plt.legend(loc='upper right')
         plt.grid(True, linestyle='--', alpha=0.5)
         plt.tight_layout()
@@ -332,6 +364,24 @@ def plot_overfitting_charts(histories, X_tr_weighted, y_train, X_val_weighted, y
     plt.title('Overfitting Analysis: k-NN Tree-Based (Sklearn)', fontsize=12, fontweight='bold')
     plt.xlabel('Number of Neighbors (k)', fontsize=10)
     plt.ylabel('RMSE Error ($)', fontsize=10)
+
+    # Display metrics for k-NN graph
+    final_tr_knn = knn_tr_err[-1]
+    final_val_knn = knn_val_err[-1]
+    min_val_knn = min(knn_val_err)
+    metrics_text_knn = (
+        f"Final Train RMSE: ${final_tr_knn:.2f}\n"
+        f"Final Test RMSE:  ${final_val_knn:.2f}\n"
+        f"Min Test RMSE:    ${min_val_knn:.2f}"
+    )
+    plt.text(
+        0.55, 0.50, metrics_text_knn,
+        transform=plt.gca().transAxes,
+        fontsize=10,
+        verticalalignment='center',
+        bbox=dict(boxstyle='round', facecolor='white', alpha=0.9)
+    )
+
     plt.legend(loc='upper right')
     plt.grid(True, linestyle='--', alpha=0.5)
     plt.tight_layout()
@@ -378,29 +428,27 @@ def process_unit_type(unittype_name, csv_filename, models_dir="models", images_d
     
     if not os.path.exists(csv_filename):
         print(f" [Warning] File {csv_filename} not found. Skipping {unittype_name}.")
-        return
+        return None
 
     os.makedirs(models_dir, exist_ok=True)
     os.makedirs(images_dir, exist_ok=True)
     
     (
-        X_df, df_clean, y, binary_cols, 
+        X_df, df_clean, y, binary_cols,
         unit_dummy_cols, agreement_dummy_cols, median_area
     ) = load_and_preprocess_data(csv_filename)
     
     if len(y) < 10:
         print(f" [Warning] Insufficient data samples ({len(y)}) for {unittype_name}. Skipping.")
-        return
+        return None
 
     feature_names = list(X_df.columns)
     X = X_df.values.astype(np.float32)
 
-    # Base Model Definitions for CV and Final Export
-    # SGDRegressor represents the PyTorch Linear nodes identically over minibatches
+    # Base Model Definitions - Parameters Strictly Standardized for Consistent CSV Evaluation
     m_lin_base = SGDRegressor(loss='squared_error', penalty=None, learning_rate='invscaling', eta0=0.01, random_state=42)
     m_lin_scaled_base = SGDRegressor(loss='squared_error', penalty='l2', alpha=1e-4, learning_rate='invscaling', eta0=0.01, random_state=42)
     
-    # MLPRegressor configurations directly mirror the PyTorch (128, 64) layered structure
     m_mlp_base = MLPRegressor(hidden_layer_sizes=(128, 64), activation='relu', solver='adam', learning_rate_init=0.001, random_state=42)
     m_mlp_scaled_base = MLPRegressor(hidden_layer_sizes=(128, 64), activation='relu', solver='adam', alpha=0.01, learning_rate_init=0.003, random_state=42)
 
@@ -453,8 +501,8 @@ def process_unit_type(unittype_name, csv_filename, models_dir="models", images_d
             
             cm = confusion_matrix(y_true_class, y_pred_class)
             report = classification_report(
-                y_true_class, 
-                y_pred_class, 
+                y_true_class,
+                y_pred_class,
                 target_names=['Undervalued (0)', 'Fairly Valued (1)', 'Overvalued (2)'],
                 digits=3,
                 zero_division=0
@@ -476,6 +524,7 @@ def process_unit_type(unittype_name, csv_filename, models_dir="models", images_d
     print(f"\n--- Training Final Models & Exporting Artifacts for {unittype_name} ---")
     plot_correlation_heatmap(X_df, y, images_dir)
 
+    # Test size strictly normalized for comparison 80/20%
     test_size = 0.2 if len(X) >= 10 else 0.5
     X_tr, X_val, y_tr, y_val = train_test_split(X, y, test_size=test_size, random_state=42)
 
@@ -488,21 +537,31 @@ def process_unit_type(unittype_name, csv_filename, models_dir="models", images_d
 
     histories = {}
 
-    model_lin_orig, tr_h1, val_h1 = train_sklearn_iterative(m_lin_base, X_tr_scaled, y_tr, X_val_scaled, y_val, epochs=150, is_scaled=False)
+    # Multiple Linear Regression (Using epochs 200)
+    model_lin_orig, tr_h1, val_h1 = train_sklearn_iterative(m_lin_base, X_tr_scaled, y_tr, X_val_scaled, y_val, epochs=200, is_scaled=False)
     pred_lin_orig = predict_model(model_lin_orig, X_val_scaled)
     histories['Multiple Linear Regression'] = {'train': tr_h1, 'val': val_h1}
+    lin_tr_rmse, lin_val_rmse = tr_h1[-1], val_h1[-1]
 
     model_lin_scaled, tr_h2, val_h2 = train_sklearn_iterative(m_lin_scaled_base, X_tr_scaled, y_tr, X_val_scaled, y_val, epochs=200, is_scaled=True)
     pred_lin_scaled = predict_model(model_lin_scaled, X_val_scaled)
     histories['Multiple Linear Regression (Target-Scaled)'] = {'train': tr_h2, 'val': val_h2}
 
-    n_neighbors = min(7, max(1, len(X_tr)-1))
+    # k-NN (Using k=7)
+    n_neighbors = 7 if len(X_tr) > 7 else max(1, len(X_tr)-1)
     knn_kd = KNeighborsRegressor(n_neighbors=n_neighbors, weights='distance', algorithm='kd_tree', n_jobs=-1).fit(X_tr_weighted, y_tr)
     pred_kd = np.maximum(knn_kd.predict(X_val_weighted), 0.0)
+    
+    # Calculate KNN Train RMSE for Gap
+    knn_tr_pred = np.maximum(knn_kd.predict(X_tr_weighted), 0.0)
+    knn_tr_rmse = np.sqrt(mean_squared_error(y_tr, knn_tr_pred))
+    knn_val_rmse = np.sqrt(mean_squared_error(y_val, pred_kd))
 
-    model_mlp_orig, tr_h4, val_h4 = train_sklearn_iterative(m_mlp_base, X_tr_scaled, y_tr, X_val_scaled, y_val, epochs=500, is_scaled=False)
+    # MLP (Using epochs 400)
+    model_mlp_orig, tr_h4, val_h4 = train_sklearn_iterative(m_mlp_base, X_tr_scaled, y_tr, X_val_scaled, y_val, epochs=400, is_scaled=False)
     pred_mlp_orig = predict_model(model_mlp_orig, X_val_scaled)
     histories['Feedforward Neural Network MLP'] = {'train': tr_h4, 'val': val_h4}
+    mlp_tr_rmse, mlp_val_rmse = tr_h4[-1], val_h4[-1]
 
     model_mlp_scaled, tr_h5, val_h5 = train_sklearn_iterative(m_mlp_scaled_base, X_tr_scaled, y_tr, X_val_scaled, y_val, epochs=400, is_scaled=True)
     pred_mlp_scaled = predict_model(model_mlp_scaled, X_val_scaled)
@@ -543,7 +602,6 @@ def process_unit_type(unittype_name, csv_filename, models_dir="models", images_d
     with open(os.path.join(models_dir, 'feature_meta.json'), 'w') as f:
         json.dump(meta, f, indent=4)
 
-    # Persist via joblib rather than Torch JIT
     joblib.dump(model_lin_orig, os.path.join(models_dir, 'multiple_linear_original_sklearn.joblib'))
     joblib.dump(model_lin_scaled, os.path.join(models_dir, 'multiple_linear_scaled_sklearn.joblib'))
     joblib.dump(KNeighborsRegressor(n_neighbors=n_neighbors, weights='distance', algorithm='kd_tree').fit(X_weighted_full, y), os.path.join(models_dir, 'knn_kd_tree.joblib'))
@@ -552,12 +610,48 @@ def process_unit_type(unittype_name, csv_filename, models_dir="models", images_d
 
     print(f" Completed {unittype_name}: Models saved in '{models_dir}/', Visuals saved in '{images_dir}/'")
 
+    # Package findings for the CSV
+    unit_result = {
+        'Model': unittype_name,
+        'n': len(X),
+        'KNN_Test_RMSE': f"${knn_val_rmse:.2f}",
+        'KNN_Gap': f"${abs(knn_val_rmse - knn_tr_rmse):.2f}",
+        'KNN_Conclusion': determine_conclusion(knn_tr_rmse, knn_val_rmse),
+        'Linear_Test_RMSE': f"${lin_val_rmse:.2f}",
+        'Linear_Gap': f"${abs(lin_val_rmse - lin_tr_rmse):.2f}",
+        'Linear_Conclusion': determine_conclusion(lin_tr_rmse, lin_val_rmse),
+        'MLP_Test_RMSE': f"${mlp_val_rmse:.2f}",
+        'MLP_Gap': f"${abs(mlp_val_rmse - mlp_tr_rmse):.2f}",
+        'MLP_Conclusion': determine_conclusion(mlp_tr_rmse, mlp_val_rmse)
+    }
+    return unit_result
+
 # ==========================================
 # MAIN ENTRY POINT
 # ==========================================
 def main():
+    # Setup data tracker for the final CSV export
+    chart_results = []
+    
+    # 1. Insert Top Headers corresponding with parameters
+    header_row = {
+        'Model': 'Model / Hyperparameters',
+        'n': '',
+        'KNN_Test_RMSE': 'k: 7, metric: distance/kd_tree',
+        'KNN_Gap': 'train/test: 80/20',
+        'KNN_Conclusion': '',
+        'Linear_Test_RMSE': 'Epochs: 200, LR: 0.01',
+        'Linear_Gap': 'Penalty: 0.0001, train/test: 80/20',
+        'Linear_Conclusion': '',
+        'MLP_Test_RMSE': 'Epochs: 400, LR: 0.003',
+        'MLP_Gap': 'Penalty: 0.01, Layers: (128, 64), train/test: 80/20',
+        'MLP_Conclusion': ''
+    }
+    chart_results.append(header_row)
+
     if os.path.exists('total_cleaned.csv'):
-        process_unit_type('Total', 'total_cleaned.csv', models_dir='models', images_dir='images')
+        res = process_unit_type('Unified', 'total_cleaned.csv', models_dir='models', images_dir='images')
+        if res: chart_results.append(res)
 
     unit_type_files = {
         'Apartment': 'total_cleaned_apartment.csv',
@@ -572,7 +666,16 @@ def main():
         if os.path.exists(csv_filename):
             models_dir = f"model_{unittype_name.lower()}"
             images_dir = f"image_{unittype_name.lower()}"
-            process_unit_type(unittype_name, csv_filename, models_dir=models_dir, images_dir=images_dir)
+            res = process_unit_type(unittype_name, csv_filename, models_dir=models_dir, images_dir=images_dir)
+            if res: chart_results.append(res)
+
+    # 2. Export the final model comparison to CSV
+    if len(chart_results) > 1:
+        df_results = pd.DataFrame(chart_results)
+        df_results.to_csv('normalized_model_comparison_v2.csv', index=False)
+        print("\nGenerated normalized_model_comparison_v2.csv successfully!")
+    else:
+        print("\nNo data processed. CSV chart was not generated.")
 
     print("\nAll pipeline tasks executed successfully!")
 

@@ -1,0 +1,9 @@
+Model,n,KNN_Test_RMSE,KNN_Gap,KNN_Conclusion,Linear_Test_RMSE,Linear_Gap,Linear_Conclusion,MLP_Test_RMSE,MLP_Gap,MLP_Conclusion
+Model / Hyperparameters,,"k: 7, metric: distance/kd_tree",train/test: 80/20,,"Epochs: 200, LR: 0.01","Penalty: 0.0001, train/test: 80/20",,"Epochs: 400, LR: 0.003","Penalty: 0.01, Layers: (128, 64), train/test: 80/20",
+Unified,5690,$746.82,$729.84,overfit,$816.60,$238.57,overfit,$776.50,$449.22,overfit
+Apartment,1855,$381.04,$351.25,overfit,$382.58,$153.23,overfit,$345.33,$45.88,good fit
+Basement,1925,$383.85,$381.31,overfit,$340.96,$273.70,overfit,$379.12,$170.02,overfit
+Condo,775,$378.62,$374.36,overfit,$451.83,$30.41,underfit,$474.69,$188.97,overfit
+Duplex_Triplex,59,$681.12,$681.12,overfit,$753.13,$558.52,overfit,$1014.19,$702.98,overfit
+House,850,$704.56,$700.90,overfit,$804.40,$54.56,good fit,$748.81,$74.15,good fit
+Townhouse,226,$609.73,$607.10,overfit,$608.13,$176.22,overfit,$932.54,$497.62,overfit
