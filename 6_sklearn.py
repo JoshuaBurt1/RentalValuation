@@ -411,7 +411,7 @@ def process_unit_type(unittype_name, csv_filename, models_dir="models", images_d
     else:
         kf = KFold(n_splits=n_splits, shuffle=True, random_state=42)
         cv_models = {
-            'Linear Regression': None,
+            'Multiple Linear Regression': None,
             'k-NN Tree-Based: KD-Tree': None,
             'Feedforward Neural Network MLP (Sklearn)': None
         }
@@ -429,9 +429,9 @@ def process_unit_type(unittype_name, csv_filename, models_dir="models", images_d
             X_tr_wt = apply_feature_weights(X_tr_sc, feature_names)
             X_va_wt = apply_feature_weights(X_va_sc, feature_names)
 
-            # Linear Regression
+            # Multiple Linear Regression
             m_log, _, _ = train_sklearn_iterative(m_lin_base, X_tr_sc, y_tr, X_va_sc, y_va, epochs=150, batch_size=128, is_scaled=False)
-            oof_predictions['Linear Regression'][val_idx] = predict_model(m_log, X_va_sc)
+            oof_predictions['Multiple Linear Regression'][val_idx] = predict_model(m_log, X_va_sc)
 
             # KNN
             knn_cv = KNeighborsRegressor(n_neighbors=min(7, max(1, len(X_tr)-1)), weights='distance', algorithm='kd_tree', n_jobs=-1).fit(X_tr_wt, y_tr)
@@ -490,11 +490,11 @@ def process_unit_type(unittype_name, csv_filename, models_dir="models", images_d
 
     model_lin_orig, tr_h1, val_h1 = train_sklearn_iterative(m_lin_base, X_tr_scaled, y_tr, X_val_scaled, y_val, epochs=150, is_scaled=False)
     pred_lin_orig = predict_model(model_lin_orig, X_val_scaled)
-    histories['Linear Regression'] = {'train': tr_h1, 'val': val_h1}
+    histories['Multiple Linear Regression'] = {'train': tr_h1, 'val': val_h1}
 
     model_lin_scaled, tr_h2, val_h2 = train_sklearn_iterative(m_lin_scaled_base, X_tr_scaled, y_tr, X_val_scaled, y_val, epochs=200, is_scaled=True)
     pred_lin_scaled = predict_model(model_lin_scaled, X_val_scaled)
-    histories['Linear Regression (Target-Scaled)'] = {'train': tr_h2, 'val': val_h2}
+    histories['Multiple Linear Regression (Target-Scaled)'] = {'train': tr_h2, 'val': val_h2}
 
     n_neighbors = min(7, max(1, len(X_tr)-1))
     knn_kd = KNeighborsRegressor(n_neighbors=n_neighbors, weights='distance', algorithm='kd_tree', n_jobs=-1).fit(X_tr_weighted, y_tr)
@@ -509,8 +509,8 @@ def process_unit_type(unittype_name, csv_filename, models_dir="models", images_d
     histories['Feedforward Neural Network MLP (Target-Scaled)'] = {'train': tr_h5, 'val': val_h5}
 
     predictions = {
-        'Linear Regression': pred_lin_orig,
-        'Linear Regression (Target-Scaled)': pred_lin_scaled,
+        'Multiple Linear Regression': pred_lin_orig,
+        'Multiple Linear Regression (Target-Scaled)': pred_lin_scaled,
         'k-NN Tree-Based: KD-Tree': pred_kd,
         'Feedforward Neural Network MLP': pred_mlp_orig,
         'Feedforward Neural Network MLP (Target-Scaled)': pred_mlp_scaled
@@ -533,8 +533,8 @@ def process_unit_type(unittype_name, csv_filename, models_dir="models", images_d
         'target_location': [43.651070, -79.347015],
         'median_area': float(median_area),
         'models_map': {
-            'Linear Regression': 'linear_original_sklearn.joblib',
-            'Linear Regression (Target-Scaled)': 'linear_scaled_sklearn.joblib',
+            'Multiple Linear Regression': 'multiple_linear_original_sklearn.joblib',
+            'Multiple Linear Regression (Target-Scaled)': 'multiple_linear_scaled_sklearn.joblib',
             'k-NN Tree-Based: KD-Tree': 'knn_kd_tree.joblib',
             'Feedforward Neural Network MLP': 'mlp_original_sklearn.joblib',
             'Feedforward Neural Network MLP (Target-Scaled)': 'mlp_scaled_sklearn.joblib'
@@ -544,8 +544,8 @@ def process_unit_type(unittype_name, csv_filename, models_dir="models", images_d
         json.dump(meta, f, indent=4)
 
     # Persist via joblib rather than Torch JIT
-    joblib.dump(model_lin_orig, os.path.join(models_dir, 'linear_original_sklearn.joblib'))
-    joblib.dump(model_lin_scaled, os.path.join(models_dir, 'linear_scaled_sklearn.joblib'))
+    joblib.dump(model_lin_orig, os.path.join(models_dir, 'multiple_linear_original_sklearn.joblib'))
+    joblib.dump(model_lin_scaled, os.path.join(models_dir, 'multiple_linear_scaled_sklearn.joblib'))
     joblib.dump(KNeighborsRegressor(n_neighbors=n_neighbors, weights='distance', algorithm='kd_tree').fit(X_weighted_full, y), os.path.join(models_dir, 'knn_kd_tree.joblib'))
     joblib.dump(model_mlp_orig, os.path.join(models_dir, 'mlp_original_sklearn.joblib'))
     joblib.dump(model_mlp_scaled, os.path.join(models_dir, 'mlp_scaled_sklearn.joblib'))
