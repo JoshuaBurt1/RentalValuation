@@ -64,10 +64,10 @@
     ],
     "median_area": 900.0,
     "models_map": {
-        "Linear Baseline Original (Sklearn)": "linear_original_sklearn.joblib",
-        "Linear Baseline (Target-Scaled Sklearn)": "linear_scaled_sklearn.joblib",
-        "k-NN Tree-Based: KD-Tree (Sklearn)": "knn_kd_tree.joblib",
-        "Feedforward Neural Network MLP Original (Sklearn)": "mlp_original_sklearn.joblib",
-        "Feedforward Neural Network MLP (Target-Scaled Sklearn)": "mlp_scaled_sklearn.joblib"
+        "Multiple Linear Regression": "multiple_linear_original_sklearn.joblib",
+        "Multiple Linear Regression (Target-Scaled)": "multiple_linear_scaled_sklearn.joblib",
+        "k-NN Tree-Based: KD-Tree": "knn_kd_tree.joblib",
+        "Feedforward Neural Network MLP": "mlp_original_sklearn.joblib",
+        "Feedforward Neural Network MLP (Target-Scaled)": "mlp_scaled_sklearn.joblib"
     }
 }
